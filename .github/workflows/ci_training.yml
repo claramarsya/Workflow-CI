@@ -8,7 +8,6 @@ jobs:
   mlflow:
     runs-on: ubuntu-latest
     steps:
-      # Checkout repo
       - uses: actions/checkout@v3
 
       # Setup Miniconda
@@ -18,9 +17,12 @@ jobs:
           python-version: "3.9"
           auto-update-conda: true
 
-      # Debug: list semua file untuk memastikan conda.yaml ada
-      - name: List repo files
-        run: ls -R
+      # Install MLflow
+      - name: Install MLflow
+        shell: bash
+        run: |
+          eval "$(conda shell.bash hook)"
+          pip install mlflow
 
       # Run MLflow Project
       - name: Run MLflow Project
