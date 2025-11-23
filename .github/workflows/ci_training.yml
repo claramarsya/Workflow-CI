@@ -17,6 +17,9 @@ jobs:
           python-version: "3.9"
           auto-update-conda: true
 
+      - name: Install MLflow
+        run: pip install mlflow
+
       # Run MLflow Project
       - name: Run MLflow Project
         shell: bash
