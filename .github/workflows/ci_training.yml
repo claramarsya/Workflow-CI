@@ -17,16 +17,9 @@ jobs:
           python-version: "3.9"
           auto-update-conda: true
 
-      # Install MLflow
-      - name: Install MLflow
-        shell: bash
-        run: |
-          eval "$(conda shell.bash hook)"
-          pip install mlflow
-
       # Run MLflow Project
       - name: Run MLflow Project
         shell: bash
         run: |
           eval "$(conda shell.bash hook)"
-          mlflow run MLProject -P data_path=FakeNewsNet_preprocessing.csv --use-conda
+          mlflow run MLProject -P data_path=FakeNewsNet_preprocessing.csv
