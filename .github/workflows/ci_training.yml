@@ -24,6 +24,14 @@ jobs:
         run: |
           eval "$(conda shell.bash hook)"
           conda info --envs
+          
+      # Install dependencies
+      - name: Install dependencies
+        shell: bash
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate mlflow
+          pip install mlflow
 
       # Jalankan MLFlow
       - name: Run MLFlow
