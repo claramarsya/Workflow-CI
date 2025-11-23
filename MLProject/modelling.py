@@ -40,9 +40,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # MLflow tracking
-mlflow_tracking_path = os.path.join(os.getcwd(), "mlruns", "ci_run")
-os.makedirs(mlflow_tracking_path, exist_ok=True)
-mlflow.set_tracking_uri(f"file://{mlflow_tracking_path}")
+# mlflow_tracking_path = os.path.join(os.getcwd(), "mlruns", "ci_run")
+# os.makedirs(mlflow_tracking_path, exist_ok=True)
+# mlflow.set_tracking_uri(f"file://{mlflow_tracking_path}")
 
 mlflow.autolog()
 with mlflow.start_run(run_name="LogisticRegression_FakeNews", nested=False):
