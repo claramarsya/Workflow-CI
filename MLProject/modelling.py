@@ -40,12 +40,12 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # MLflow tracking
-mlflow_tracking_path = os.path.abspath("mlruns")
+mlflow_tracking_path = os.path.join(os.getcwd(), "mlruns")
 os.makedirs(mlflow_tracking_path, exist_ok=True)
-mlflow.set_tracking_uri(f"file:{mlflow_tracking_path}")
+mlflow.set_tracking_uri(f"file://{mlflow_tracking_path}")
 
+mlflow.autolog()
 with mlflow.start_run(run_name="LogisticRegression_FakeNews", nested=False):
-    mlflow.autolog()
     mlflow.log_param("tfidf_max_features", 5000)
 
     # Training

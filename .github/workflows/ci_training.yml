@@ -21,7 +21,7 @@ jobs:
         shell: bash
         run: |
           eval "$(conda shell.bash hook)"
-          conda env create -f MLProject/conda.yaml
+          conda env create -f MLProject/conda.yaml -n mlflow-env
 
       # Run MLflow Project
       - name: Run MLflow Project
