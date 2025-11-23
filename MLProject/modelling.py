@@ -1,11 +1,4 @@
 import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--data_path", type=str, default="FakeNewsNet_preprocessing.csv")
-args = parser.parse_args()
-
-DATA_PATH = args.data_path
-
 import os
 import mlflow
 import mlflow.sklearn
@@ -15,9 +8,14 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 
-# Load Dataset Preprocessing
-df = pd.read_csv(DATA_PATH)
+# Argumen
+parser = argparse.ArgumentParser()
+parser.add_argument("--data_path", type=str, default="FakeNewsNet_preprocessing.csv")
+args = parser.parse_args()
+DATA_PATH = args.data_path
 
+# Load dataset
+df = pd.read_csv(DATA_PATH)
 print("Jumlah data:", df.shape)
 print(df.head())
 
@@ -26,18 +24,13 @@ text_col = "clean_title"
 label_col = "real"
 
 # Fix missing clean title
-df[text_col] = df[text_col].astype(str)
-df['clean_title'] = df['clean_title'].astype(str)
-
-# Ganti NaN menjadi string kosong
-df['clean_title'] = df['clean_title'].fillna("")
-
-print("Missing clean_title:", df['clean_title'].isna().sum())
+df[text_col] = df[text_col].fillna("").astype(str)
+print("Missing clean_title:", df[text_col].isna().sum())
 
 X = df[text_col]
 y = df[label_col]
 
-# TF-IDF Vectorizer
+# TF-IDF
 tfidf = TfidfVectorizer(max_features=5000)
 X_tfidf = tfidf.fit_transform(X)
 
@@ -46,20 +39,20 @@ X_train, X_test, y_train, y_test = train_test_split(
     X_tfidf, y, test_size=0.2, random_state=42, stratify=y
 )
 
-mlflow_tracking_path = os.path.join(os.getcwd(), "mlruns")
-os.makedirs(mlflow_tracking_path, exist_ok=True)
+# MLflow tracking
+mlflow_tracking_path = os.path.abspath("mlruns")
 mlflow.set_tracking_uri(f"file:{mlflow_tracking_path}")
 
-# Model Training dengan MLflow Autolog 
-with mlflow.start_run(run_name="LogisticRegression_FakeNews"):
+with mlflow.start_run(run_name="LogisticRegression_FakeNews", nested=False):
     mlflow.autolog()
+    mlflow.log_param("tfidf_max_features", 5000)
 
+    # Training
     model = LogisticRegression(max_iter=200)
     model.fit(X_train, y_train)
 
     # Prediksi
     y_pred = model.predict(X_test)
-
     acc = accuracy_score(y_test, y_pred)
 
     print("\nAccuracy:", acc)
@@ -69,5 +62,4 @@ with mlflow.start_run(run_name="LogisticRegression_FakeNews"):
     mlflow.sklearn.log_model(model, "model")
 
 print("\nModel selesai dilatih dan dicatat di MLflow.")
-print("Untuk membuka MLflow UI:")
-print("   mlflow ui")
+print("Untuk membuka MLflow UI:\n   mlflow ui")
