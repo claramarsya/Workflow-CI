@@ -28,5 +28,4 @@ jobs:
         shell: bash
         run: |
           eval "$(conda shell.bash hook)"
-          conda activate mlflow-env
-          mlflow run MLProject/ -P data_path=FakeNewsNet_preprocessing.csv --no-conda
+          mlflow run MLProject/ -P data_path=FakeNewsNet_preprocessing.csv
