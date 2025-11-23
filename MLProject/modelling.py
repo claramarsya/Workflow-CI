@@ -46,7 +46,8 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # Model Training dengan MLflow Autolog 
-mlflow.set_tracking_uri("file:./mlruns")
+mlflow_tracking_path = os.path.abspath("mlruns")
+mlflow.set_tracking_uri(f"file:{mlflow_tracking_path}")
 
 with mlflow.start_run(run_name="LogisticRegression_FakeNews"):
     mlflow.autolog()
