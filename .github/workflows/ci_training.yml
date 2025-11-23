@@ -14,19 +14,21 @@ jobs:
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: "3.9"
           auto-update-conda: true
 
-      # Install MLflow
-      - name: Install MLflow
+      # Create and activate conda environment from conda.yaml
+      - name: Create Conda Environment
         shell: bash
         run: |
           eval "$(conda shell.bash hook)"
-          pip install mlflow
+          conda env create -f conda.yaml -n mlflow-env
+          conda activate mlflow-env
+          conda info --envs
 
       # Run MLflow Project
       - name: Run MLflow Project
         shell: bash
         run: |
           eval "$(conda shell.bash hook)"
+          conda activate mlflow-env
           mlflow run MLProject -P data_path=FakeNewsNet_preprocessing.csv
