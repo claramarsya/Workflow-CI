@@ -16,14 +16,6 @@ jobs:
         with:
           python-version: "3.9"
           auto-update-conda: true
-          activate-environment: mlflow  # beri nama environment
-
-      # Inisialisasi Conda
-      - name: Initialize Conda
-        shell: bash
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda info --envs
 
       # Jalankan MLFlow
       - name: Run MLFlow
