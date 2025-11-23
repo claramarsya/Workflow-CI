@@ -1,0 +1,10 @@
+name: fake-news-classifier
+
+conda_env: MLProject/conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      data_path: {type: str, default: "FakeNewsNet_preprocessing.csv"}
+    command: |
+      python modelling.py --data_path {data_path}
