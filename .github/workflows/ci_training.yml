@@ -1,35 +1,58 @@
-name: CI - Train Model
+name: MLFlow-CI
 
 on:
   push:
-    branches: ["main"]
-  workflow_dispatch:
+    branches: [ main ]
 
 jobs:
-  train-model:
+  mlflow:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        shell: bash -l {0}
+
     steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-    - name: Set up Conda
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        activate-environment: mlflow-env
-        environment-file: MLProject/conda.yaml
-        python-version: 3.9
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: ""
+          auto-update-conda: true
+          python-version: "3.9"
 
-    - name: Install pip dependencies
-      run: |
-        pip install mlflow scikit-learn pandas numpy dagshub
+      - name: Install dependencies
+        run: conda install pip
 
-    - name: Run MLflow Project
-      run: |
-        mlflow run MLProject
+      - name: Run MLFlow
+        run: mlflow run MLProject
+name: MLFlow-CI
 
-    - name: Upload Model Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: trained-model
-        path: mlruns/
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  mlflow:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: ""
+          auto-update-conda: true
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: conda install pip
+
+      - name: Run MLFlow
+        run: mlflow run MLProject
