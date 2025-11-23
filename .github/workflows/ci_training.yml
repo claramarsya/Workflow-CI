@@ -7,7 +7,6 @@ on:
 jobs:
   mlflow:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
 
@@ -15,55 +14,21 @@ jobs:
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          activate-environment: ""
-          auto-update-conda: true
           python-version: "3.10"
+          auto-update-conda: true
+          activate-environment: mlflow  # beri nama environment
 
-      # Inisialisasi conda ke shell (WAJIB!)
+      # Inisialisasi Conda
       - name: Initialize Conda
         shell: bash
         run: |
           eval "$(conda shell.bash hook)"
-          conda --version
+          conda info --envs
 
-      # Jalankan MLFlow project
+      # Jalankan MLFlow
       - name: Run MLFlow
         shell: bash
-        run: |
-          eval "$(conda shell.bash hook)"
-          mlflow run MLProject
-name: MLFlow-CI
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  mlflow:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      # Setup Conda
-      - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          activate-environment: ""
-          auto-update-conda: true
-          python-version: "3.10"
-
-      # Inisialisasi conda ke shell (WAJIB!)
-      - name: Initialize Conda
-        shell: bash
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda --version
-
-      - name: Run MLFlow
-        shell: bash -l {0}
         run: |
           eval "$(conda shell.bash hook)"
           conda activate mlflow
-          python modelling.py --data_path FakeNewsNet_preprocessing.csv
-
+          mlflow run MLProject
