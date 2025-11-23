@@ -10,15 +10,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Setup Conda
+      # Setup Miniconda
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: "3.9"
           auto-update-conda: true
+          python-version: "3.9"
 
-      # Jalankan MLFlow
-      - name: Run MLFlow
+      # Jalankan MLFlow Project
+      - name: Run MLFlow Project
         shell: bash
         run: |
           eval "$(conda shell.bash hook)"
