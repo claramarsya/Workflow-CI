@@ -14,11 +14,18 @@ jobs:
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          auto-update-conda: true
           python-version: "3.9"
+          auto-update-conda: true
 
-      # Jalankan MLFlow Project
-      - name: Run MLFlow Project
+      # Install MLflow
+      - name: Install MLflow
+        shell: bash
+        run: |
+          eval "$(conda shell.bash hook)"
+          pip install mlflow
+
+      # Run MLflow Project
+      - name: Run MLflow Project
         shell: bash
         run: |
           eval "$(conda shell.bash hook)"
