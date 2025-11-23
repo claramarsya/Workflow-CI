@@ -6,6 +6,7 @@ args = parser.parse_args()
 
 DATA_PATH = args.data_path
 
+import os
 import mlflow
 import mlflow.sklearn
 import pandas as pd
