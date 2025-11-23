@@ -29,4 +29,4 @@ jobs:
         shell: bash
         run: |
           eval "$(conda shell.bash hook)"
-          mlflow run MLProject -P data_path=FakeNewsNet_preprocessing.csv
+          mlflow run MLProject -P data_path=FakeNewsNet_preprocessing.csv --use-conda
