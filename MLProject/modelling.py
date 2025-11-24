@@ -6,61 +6,87 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report
+import uvicorn
 
-# Argumen
-parser = argparse.ArgumentParser()
-parser.add_argument("--data_path", type=str, default="FakeNewsNet_preprocessing.csv")
-args = parser.parse_args()
-DATA_PATH = args.data_path
 
-# Load dataset
-df = pd.read_csv(DATA_PATH)
-print("Jumlah data:", df.shape)
-print(df.head())
+def train_model(data_path):
+    print("=== MEMUAT DATASET PREPROCESSING ===")
+    df = pd.read_csv(data_path)
+    print(df.head())
+    
+    text_col = "clean_title"
+    label_col = "real"
+    
+    # === SAFETY CLEANING (FIX ERROR) ===
+    print("\n=== FIXING NaN / BAD STRINGS ===")
+    
+    # pastikan kolom ada
+    if text_col not in df.columns:
+        raise Exception(f"Kolom '{text_col}' tidak ditemukan! Apakah file hasil preprocessing benar?")
+    
+    # drop baris dengan missing text
+    df = df.dropna(subset=[text_col])
+    
+    # convert ke string
+    df[text_col] = df[text_col].astype(str)
+    
+    # ganti string kosong
+    df[text_col] = df[text_col].replace("", "empty")
+    
+    print("Sisa data setelah cleaning:", len(df))
 
-# Kolom
-text_col = "clean_title"
-label_col = "real"
 
-# Fix missing clean title
-df[text_col] = df[text_col].fillna("").astype(str)
-print("Missing clean_title:", df[text_col].isna().sum())
+    print("\n=== SPLIT DATA ===")
+    X_train, X_test, y_train, y_test = train_test_split(
+        df[text_col],
+        df[label_col],
+        test_size=0.2,
+        random_state=42,
+        stratify=df[label_col]
+    )
+    print("Train size:", len(X_train))
+    print("Test size :", len(X_test))
 
-X = df[text_col]
-y = df[label_col]
+    # MLflow Setup
+    mlflow.set_experiment("FakeNews_Clara")
 
-# TF-IDF
-tfidf = TfidfVectorizer(max_features=5000)
-X_tfidf = tfidf.fit_transform(X)
+    with mlflow.start_run():
+        # Model pipeline
+        pipeline = Pipeline([
+            ('tfidf', TfidfVectorizer(max_features=5000)),
+            ('clf', LogisticRegression(max_iter=200))
+        ])
 
-# Split
-X_train, X_test, y_train, y_test = train_test_split(
-    X_tfidf, y, test_size=0.2, random_state=42, stratify=y
-)
+        print("\n=== TRAINING MODEL ===")
+        pipeline.fit(X_train, y_train)
 
-# MLflow tracking
-# mlflow_tracking_path = os.path.join(os.getcwd(), "mlruns", "ci_run")
-# os.makedirs(mlflow_tracking_path, exist_ok=True)
-# mlflow.set_tracking_uri(f"file://{mlflow_tracking_path}")
+        print("\n=== EVALUASI MODEL ===")
+        y_pred = pipeline.predict(X_test)
+        acc = accuracy_score(y_test, y_pred)
+        print("Accuracy:", acc)
+        print(classification_report(y_test, y_pred))
 
-mlflow.autolog()
-with mlflow.start_run(run_name="LogisticRegression_FakeNews", nested=False):
-    mlflow.log_param("tfidf_max_features", 5000)
+        # Log metrics ke MLflow
+        mlflow.log_metric("accuracy", acc)
 
-    # Training
-    model = LogisticRegression(max_iter=200)
-    model.fit(X_train, y_train)
+        # Log model
+        mlflow.sklearn.log_model(pipeline, artifact_path="model")
 
-    # Prediksi
-    y_pred = model.predict(X_test)
-    acc = accuracy_score(y_test, y_pred)
+        print("\nModel berhasil disimpan ke MLflow.")
 
-    print("\nAccuracy:", acc)
-    print(classification_report(y_test, y_pred))
+    return pipeline
 
-    mlflow.log_metric("accuracy", acc)
-    mlflow.sklearn.log_model(model, "model")
 
-print("\nModel selesai dilatih dan dicatat di MLflow.")
-print("Untuk membuka MLflow UI:\n   mlflow ui")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--data_path",
+        type=str,
+        default="FakeNewsNet_preprocessing.csv",
+        help="Path ke dataset hasil preprocessing"
+    )
+    args = parser.parse_args()
+
+    train_model(args.data_path)
