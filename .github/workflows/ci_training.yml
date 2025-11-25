@@ -7,22 +7,22 @@ on:
 jobs:
   mlflow:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
-      # Setup Miniconda
+      # Setup Conda
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
 
-      # Create environment from conda.yaml
+      # Create or update environment
       - name: Create conda environment
         run: |
-          conda env create -f MLProject/conda.yaml
-          conda activate mlflow-env
+          conda env create -f MLProject/conda.yaml || conda env update -f MLProject/conda.yaml --prune
 
-      # Run Python script within conda env
+      # Run modelling script
       - name: Run Modelling Script
         run: |
           conda run -n mlflow-env python MLProject/modelling.py --data_path MLProject/FakeNewsNet_preprocessing.csv
